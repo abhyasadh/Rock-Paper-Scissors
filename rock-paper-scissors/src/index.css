@@ -1,0 +1,320 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  font-family: "Blinker";
+}
+
+.root {
+  position: relative;
+  color: white;
+}
+
+.homePage {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(315deg, rgb(20, 20, 20), rgb(44, 44, 44));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageContainer {
+  max-width: 450px;
+}
+
+.imageContainer img {
+  width: 100%;
+  height: auto;
+}
+
+h1 {
+  margin: 20px 0px;
+  font-size: 50px;
+  font-weight: 600;
+  color: white;
+  cursor: default;
+}
+
+.menu {
+  display: flex;
+  gap: 12px;
+  margin: 0px 12px;
+}
+
+.button {
+  appearance: none;
+  background-color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  box-sizing: border-box;
+  color: #000000;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Blinker";
+  font-size: 20px;
+  font-weight: 600;
+  line-height: normal;
+  margin: 0;
+  height: 60px;
+  min-width: 0;
+  outline: none;
+  padding: 16px 0px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 150ms ease-in-out;
+  width: calc(100% - 4px);
+}
+
+.button:hover {
+  background-color: transparent;
+  color: #ffffff;
+}
+
+.button:active {
+  box-shadow: none;
+  transform: translateY(0);
+}
+
+.gameIdInputContainer {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+}
+
+.gameIdInputContainer input {
+  font-family: "Blinker";
+  font-size: 20px;
+  font-weight: 600;
+  line-height: normal;
+  text-align: center;
+  border-radius: 12px 0 0 12px;
+  border: 2px solid #ffffff;
+  background-color: #1A1A1A;
+  color: white;
+  height: 56px;
+  margin: 0;
+  padding: 0;
+  width: calc(100% - 28px);
+}
+
+.gameIdInputContainer input:focus {
+  border: 2px solid #ffffff;
+  outline: none;
+}
+
+.gameIdInputContainer button {
+  background-color: white;
+  color: black;
+  border: none;
+  border-radius: 0 12px 12px 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  font-size: 18px;
+  width: 28px;
+}
+
+.gamePage {
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, rgb(176, 176, 176), rgb(88, 88, 88), rgb(20, 20, 20) 40%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gameArea {
+  display: flex;
+  gap: 3px;
+  width: 100vw;
+  height: 100vh;
+}
+
+.players {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(0deg, black, rgb(27, 27, 27));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.playerName {
+  font-size: 40px;
+  padding: 12px 0;
+  font-weight: 600;
+}
+
+.text p {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 12px;
+}
+
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.choices .choiceBtn {
+  appearance: none;
+  background-color: #000000;
+  border: 2px solid #ffffff;
+  color: white;
+  border-radius: 12px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: "Blinker";
+  font-size: 18px;
+  font-weight: 600;
+  line-height: normal;
+  margin: 0;
+  height: 50px;
+  min-width: 0;
+  outline: none;
+  padding: 16px 0;
+  text-decoration: none;
+  transition: all 150ms ease-in-out;
+  width: 180px;
+}
+
+.choices button:hover {
+  background-color: white;
+  color: black;
+}
+.gameId {
+  font-size: 20px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.gameId img {
+  cursor: pointer;
+}
+
+.result {
+  appearance: none;
+  color: white;
+  border-radius: 12px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: "Blinker";
+  font-size: 24px;
+  font-weight: 600;
+  line-height: normal;
+  margin: 0;
+  height: 60px;
+  min-width: 0;
+  outline: none;
+  padding: 16px 0;
+  text-decoration: none;
+  transition: all 150ms ease-in-out;
+  width: 200px;
+}
+
+.backHome {
+  position: absolute;
+  border: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70px;
+  height: 70px;
+  background-color: black;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);
+  cursor: pointer;
+  transition: 100ms ease-in-out;
+}
+
+.backHome:hover{
+  transform: translate(-50%, calc(-50% - 3px));
+}
+
+.lds-ellipsis, .lds-ellipsis div {
+  box-sizing: border-box;
+}
+
+.lds-ellipsis {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.lds-ellipsis div {
+  position: absolute;
+  top: 33.33333px;
+  width: 13.33333px;
+  height: 13.33333px;
+  border-radius: 50%;
+  background: currentColor;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+
+.lds-ellipsis div:nth-child(1) {
+  left: 8px;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+
+.lds-ellipsis div:nth-child(2) {
+  left: 8px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+
+.lds-ellipsis div:nth-child(3) {
+  left: 32px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+
+.lds-ellipsis div:nth-child(4) {
+  left: 56px;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
+}

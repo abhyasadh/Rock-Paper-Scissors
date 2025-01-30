@@ -26,6 +26,10 @@ wss.on('connection', (ws) => {
       case 'make_choice':
         handlePlayerChoice(ws, data.gameId, data.choice);
         break;
+      
+      case 'request_rematch':
+        handleRematchRequest(ws, data.gameId);
+        break;
 
       default:
         ws.send(JSON.stringify({ type: 'error', message: 'Invalid message type.' }));
@@ -39,17 +43,17 @@ wss.on('connection', (ws) => {
 });
 
 function generateShortId(length = 6) {
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let id = '';
-    for (let i = 0; i < length; i++) {
-        id += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return id;
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let id = '';
+  for (let i = 0; i < length; i++) {
+    id += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return id;
 }
 
 function handleCreateGame(ws) {
   const gameId = generateShortId();
-  games.set(gameId, { player1: ws, player2: null, choices: {} });
+  games.set(gameId, { player1: ws, player2: null, choices: {}, rematchRequests: new Set() });
   ws.send(JSON.stringify({ type: 'game_created', gameId }));
   console.log(`Game created with ID: ${gameId}`);
 }
@@ -68,11 +72,9 @@ function handleJoinGame(ws, gameId) {
   }
 
   game.player2 = ws;
-  if (game.choices.player1) { 
-    ws.send(JSON.stringify({ type: 'choice_made', gameId, message: 'Player 1 has made a choice!' }));
-    game.player1.send(JSON.stringify({ type: 'player_joined', message: 'Player 2 has joined the game.' }));
-    return;
-  };
+  game.choices = {};
+  game.rematchRequests.clear();
+
   ws.send(JSON.stringify({ type: 'game_joined', gameId }));
   game.player1.send(JSON.stringify({ type: 'player_joined', message: 'Player 2 has joined the game.' }));
 
@@ -89,10 +91,10 @@ function handlePlayerChoice(ws, gameId, choice) {
 
   if (ws === game.player1) {
     game.choices.player1 = choice;
-    if (game.player2) game.player2.send(JSON.stringify({ type: 'choice_made', message: 'Player 1 has made a choice!' }))
+    if (game.player2) game.player2.send(JSON.stringify({ type: 'choice_made', message: 'Player 1 has made a choice!' }));
   } else if (ws === game.player2) {
     game.choices.player2 = choice;
-    game.player1.send(JSON.stringify({ type: 'choice_made', message: 'Player 2 has made a choice!' }))
+    game.player1.send(JSON.stringify({ type: 'choice_made', message: 'Player 2 has made a choice!' }));
   } else {
     ws.send(JSON.stringify({ type: 'error', message: 'You are not part of this game.' }));
     return;
@@ -113,8 +115,6 @@ function determineWinner(gameId) {
 
   player1.send(JSON.stringify({ type: 'game_result', result, yourChoice: choices.player1, opponentChoice: choices.player2 }));
   player2.send(JSON.stringify({ type: 'game_result', result: reverseResult(result), yourChoice: choices.player2, opponentChoice: choices.player1 }));
-
-  games.delete(gameId);
 }
 
 function getGameResult(choice1, choice2) {
@@ -134,6 +134,27 @@ function reverseResult(result) {
   if (result === 'win') return 'lose';
   if (result === 'lose') return 'win';
   return 'draw';
+}
+
+function handleRematchRequest(ws, gameId) {
+  const game = games.get(gameId);
+
+  if (!game) {
+    ws.send(JSON.stringify({ type: 'error', message: 'Game not found.' }));
+    return;
+  }
+
+  game.rematchRequests.add(ws);
+
+  if (game.rematchRequests.size === 2) {
+    game.choices = {};
+    game.rematchRequests.clear();
+    game.player1.send(JSON.stringify({ type: 'rematch_accepted', message: 'Rematch started!' }));
+    game.player2.send(JSON.stringify({ type: 'rematch_accepted', message: 'Rematch started!' }));
+    console.log(`Rematch started for game: ${gameId}`);
+  } else {
+    ws.send(JSON.stringify({ type: 'rematch_pending', message: 'Waiting for the other player to accept rematch.' }));
+  }
 }
 
 function cleanupDisconnectedPlayer(ws) {

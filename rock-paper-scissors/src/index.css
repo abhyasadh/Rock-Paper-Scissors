@@ -232,23 +232,33 @@ h1 {
   width: 200px;
 }
 
-.backHome {
+.afterResult {
   position: absolute;
   border: none;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 70px;
-  height: 70px;
+  height: fit-content;
   background-color: black;
   border-radius: 12px;
   box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);
-  cursor: pointer;
-  transition: 100ms ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 20px;
+  padding-bottom: 12px;
 }
 
-.backHome:hover{
-  transform: translate(-50%, calc(-50% - 3px));
+.afterResult button {
+  background-color: transparent;
+  border: none;
+  transition: 100ms ease-in-out;
+  cursor: pointer;
+}
+
+.afterResult button:hover{
+  transform: translateY(-3px);
 }
 
 .lds-ellipsis, .lds-ellipsis div {

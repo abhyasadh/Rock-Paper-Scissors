@@ -6,6 +6,7 @@ import rock from "../assets/rock.png";
 import paper from "../assets/paper.png";
 import scissors from "../assets/scissors.png";
 import home from "../assets/home.png";
+import restart from "../assets/restart.png";
 import ready from "../assets/ready.png";
 import copy from "../assets/copy.png";
 
@@ -26,6 +27,8 @@ function Game() {
         : "Opponent is Choosing..."
       : "Waiting for Opponent to Join..."
   );
+  const [playerScore, setPlayerScore] = useState(0);
+  const [opponentScore, setOpponentScore] = useState(0);
 
   useEffect(() => {
     if (!isConnected) {
@@ -44,6 +47,16 @@ function Game() {
       } else if (message.type === "game_result") {
         setOpponentChoice(message.opponentChoice);
         setResult(message.result);
+        if (message.result === "win") {
+          setPlayerScore((prevScore) => prevScore + 1);
+        } else if (message.result === "lose") {
+          setOpponentScore((prevScore) => prevScore + 1);
+        }
+      } else if (message.type === "rematch_accepted") {
+        setChoice("");
+        setOpponentChoice("");
+        setResult("");
+        setStatus("Opponent is Choosing...");
       } else if (message.type === "info") {
         toast.info(message.message);
       } else if (message.type === "error") {
@@ -65,7 +78,10 @@ function Game() {
     <div className="gamePage">
       <div className="gameArea">
         <div className="players player-1">
-          <div className="playerName">You</div>
+          <div className="playerName">
+            You{" "}
+            {playerScore != 0 || opponentScore != 0 ? `(${playerScore})` : ""}
+          </div>
           <div className="choiceImage">
             <img id="choiceImageImg" src={rock} alt="" height={"200px"} />
           </div>
@@ -123,7 +139,10 @@ function Game() {
           )}
         </div>
         <div className="players player-2">
-          <div className="playerName">Opponent</div>
+          <div className="playerName">
+            Opponent{" "}
+            {playerScore != 0 || opponentScore != 0 ? `(${opponentScore})` : ""}
+          </div>
           <div className="choiceImage">
             {opponentChoice ? (
               <img
@@ -205,10 +224,10 @@ function Game() {
         <div className="afterResult">
           <button
             onClick={() => {
-              navigate("/");
+              sendMessage({ type: "request_rematch", gameId });
             }}
           >
-            <img src={""} alt="" width={"36px"} />
+            <img src={restart} alt="" width={"30px"} />
           </button>
           <button
             onClick={() => {

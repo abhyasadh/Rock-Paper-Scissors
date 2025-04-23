@@ -9,6 +9,7 @@ import home from "../assets/home.png";
 import restart from "../assets/restart.png";
 import ready from "../assets/ready.png";
 import copy from "../assets/copy.png";
+import { connectToServer } from "../components/socketService";
 
 function Game() {
   const { gameId } = useParams();
@@ -17,23 +18,38 @@ function Game() {
   const location = useLocation();
 
   const [choice, setChoice] = useState("");
-  const [hasOpponent, setHasOpponent] = useState(location.state.opponent);
+  const [hasOpponent, setHasOpponent] = useState(
+    location.state?.opponent ?? true
+  );
   const [opponentChoice, setOpponentChoice] = useState("");
+
   const [result, setResult] = useState("");
   const [status, setStatus] = useState(
     hasOpponent
-      ? location.state.choiceMade
+      ? location.state?.choiceMade ?? false
         ? "Opponent have made their choice!"
         : "Opponent is Choosing..."
       : "Waiting for Opponent to Join..."
   );
+
   const [playerScore, setPlayerScore] = useState(0);
   const [opponentScore, setOpponentScore] = useState(0);
 
+  const [rematchRequests, setRematchRequests] = useState({
+    you: false,
+    opponent: false,
+  });
+
   useEffect(() => {
     if (!isConnected) {
-      navigate("/");
-      return;
+      connectToServer(
+        "ws://localhost:5000",
+        () => {},
+        (error) => console.error("WebSocket error:", error),
+        () => console.log("WebSocket connection closed")
+      );
+      sendMessage({ type: "join_game", gameId });
+      localStorage.setItem("gameId", gameId);
     }
 
     socket.onmessage = (event) => {
@@ -52,27 +68,51 @@ function Game() {
         } else if (message.result === "lose") {
           setOpponentScore((prevScore) => prevScore + 1);
         }
+      } else if (message.type === "rematch_requested") {
+        setRematchRequests((prev) => ({ ...prev, opponent: true }));
       } else if (message.type === "rematch_accepted") {
         setChoice("");
         setOpponentChoice("");
         setResult("");
+        setRematchRequests({
+          you: false,
+          opponent: false,
+        });
         setStatus("Opponent is Choosing...");
       } else if (message.type === "info") {
         toast.info(message.message);
+        if (message.message === "Other player disconnected. Game ended.") {
+          setHasOpponent(false);
+          setPlayerScore(0);
+          setOpponentScore(0);
+          setChoice("");
+          setOpponentChoice("");
+          setResult("");
+          setRematchRequests({
+            you: false,
+            opponent: false,
+          });
+          setStatus("Waiting for Opponent to Join...");
+        }
       } else if (message.type === "error") {
-        alert(message.message);
+        toast.error(message.message);
+        navigate("/");
       }
     };
-  }, [navigate]);
+  }, [navigate, gameId]);
 
   const sendMove = (move) => {
-    setChoice(move);
-    sendMessage({ type: "make_choice", gameId, choice: move });
+    if (hasOpponent) {
+      setChoice(move);
+      sendMessage({ type: "make_choice", gameId, choice: move });
+    }
   };
 
   const viewChoice = (move) => {
     document.getElementById("choiceImageImg").src = move;
   };
+
+  console.log(hasOpponent);
 
   return (
     <div className="gamePage">
@@ -80,7 +120,7 @@ function Game() {
         <div className="players player-1">
           <div className="playerName">
             You{" "}
-            {playerScore != 0 || opponentScore != 0 ? `(${playerScore})` : ""}
+            {playerScore !== 0 || opponentScore !== 0 ? `(${playerScore})` : ""}
           </div>
           <div className="choiceImage">
             <img id="choiceImageImg" src={rock} alt="" height={"200px"} />
@@ -109,8 +149,7 @@ function Game() {
               <div className="choices">
                 <button
                   id="rockBtn"
-                  className="choiceBtn"
-                  disabled={choice !== ""}
+                  className={`choiceBtn ${hasOpponent ? "" : "disabled"}`}
                   onMouseOver={() => viewChoice(rock)}
                   onClick={() => sendMove("rock")}
                 >
@@ -119,7 +158,7 @@ function Game() {
 
                 <button
                   id="paperBtn"
-                  className="choiceBtn"
+                  className={`choiceBtn ${hasOpponent ? "" : "disabled"}`}
                   onMouseOver={() => viewChoice(paper)}
                   onClick={() => sendMove("paper")}
                 >
@@ -128,7 +167,7 @@ function Game() {
 
                 <button
                   id="scissorsBtn"
-                  className="choiceBtn"
+                  className={`choiceBtn ${hasOpponent ? "" : "disabled"}`}
                   onMouseOver={() => viewChoice(scissors)}
                   onClick={() => sendMove("scissors")}
                 >
@@ -141,7 +180,9 @@ function Game() {
         <div className="players player-2">
           <div className="playerName">
             Opponent{" "}
-            {playerScore != 0 || opponentScore != 0 ? `(${opponentScore})` : ""}
+            {playerScore !== 0 || opponentScore !== 0
+              ? `(${opponentScore})`
+              : ""}
           </div>
           <div className="choiceImage">
             {opponentChoice ? (
@@ -221,22 +262,31 @@ function Game() {
         </div>
       </div>
       {result && (
-        <div className="afterResult">
-          <button
-            onClick={() => {
-              sendMessage({ type: "request_rematch", gameId });
-            }}
-          >
-            <img src={restart} alt="" width={"30px"} />
-          </button>
-          <button
-            onClick={() => {
-              navigate("/");
-            }}
-          >
-            <img src={home} alt="" width={"36px"} />
-          </button>
-        </div>
+        <>
+          <div className="afterResult">
+            {rematchRequests.you && (
+              <span className="rematchRequests left">Rematch Requested!</span>
+            )}
+            <button
+              onClick={() => {
+                setRematchRequests((prev) => ({ ...prev, you: true }));
+                sendMessage({ type: "request_rematch", gameId });
+              }}
+            >
+              <img src={restart} alt="" width={"30px"} />
+            </button>
+            {rematchRequests.opponent && (
+              <span className="rematchRequests right">Rematch Requested!</span>
+            )}
+            <button
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              <img src={home} alt="" width={"36px"} />
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

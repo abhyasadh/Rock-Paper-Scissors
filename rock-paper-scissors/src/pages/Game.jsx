@@ -43,7 +43,7 @@ function Game() {
   useEffect(() => {
     if (!isConnected) {
       connectToServer(
-        "ws://localhost:5000",
+        `ws://${process.env.REACT_APP_IP}:${process.env.REACT_APP_PORT}`,
         () => {},
         (error) => console.error("WebSocket error:", error),
         () => console.log("WebSocket connection closed")
@@ -123,7 +123,7 @@ function Game() {
             {playerScore !== 0 || opponentScore !== 0 ? `(${playerScore})` : ""}
           </div>
           <div className="choiceImage">
-            <img id="choiceImageImg" src={rock} alt="" height={"200px"} />
+            <img id="choiceImageImg" className="panelImage" src={rock} alt="" />
           </div>
           {choice ? (
             result ? (
@@ -188,6 +188,7 @@ function Game() {
             {opponentChoice ? (
               <img
                 id="opponentChoice"
+                className="panelImage"
                 src={
                   opponentChoice === "rock"
                     ? rock
@@ -196,7 +197,6 @@ function Game() {
                     : scissors
                 }
                 alt=""
-                height={"200px"}
               />
             ) : (
               <div
@@ -208,12 +208,7 @@ function Game() {
                 }}
               >
                 {status === "Opponent have made their choice!" ? (
-                  <img
-                    src={ready}
-                    alt=""
-                    width={"80px"}
-                    style={{ marginBottom: "14px" }}
-                  />
+                  <img src={ready} className="readyImage" alt="" />
                 ) : (
                   <div className="lds-ellipsis">
                     <div></div>
@@ -222,25 +217,41 @@ function Game() {
                     <div></div>
                   </div>
                 )}
-                <span style={{ fontSize: "20px" }}>{status}</span>
+                <span className="statusText">{status}</span>
               </div>
             )}
           </div>
           {hasOpponent ? (
             result ? (
-              <div
-                className="result"
-                style={{
-                  backgroundColor:
-                    result === "win"
-                      ? "red"
-                      : result === "lose"
-                      ? "green"
-                      : "gray",
-                }}
-              >
-                {result === "win" ? "LOST" : result === "lose" ? "WON" : "DRAW"}
-              </div>
+              rematchRequests.opponent ? (
+                <button
+                  className="result accept"
+                  onClick={() => {
+                    setRematchRequests((prev) => ({ ...prev, you: true }));
+                    sendMessage({ type: "request_rematch", gameId });
+                  }}
+                >
+                  REMATCH?
+                </button>
+              ) : (
+                <div
+                  className="result"
+                  style={{
+                    backgroundColor:
+                      result === "win"
+                        ? "red"
+                        : result === "lose"
+                        ? "green"
+                        : "gray",
+                  }}
+                >
+                  {result === "win"
+                    ? "LOST"
+                    : result === "lose"
+                    ? "WON"
+                    : "DRAW"}
+                </div>
+              )
             ) : (
               <div></div>
             )
@@ -250,8 +261,8 @@ function Game() {
                 Game ID: {gameId}
                 <img
                   src={copy}
+                  className="copyIcon"
                   alt=""
-                  height={"24px"}
                   onClick={() => {
                     navigator.clipboard.writeText(gameId);
                   }}
@@ -273,17 +284,14 @@ function Game() {
                 sendMessage({ type: "request_rematch", gameId });
               }}
             >
-              <img src={restart} alt="" width={"30px"} />
+              <img src={restart} className="restartIcon" alt="" />
             </button>
-            {rematchRequests.opponent && (
-              <span className="rematchRequests right">Rematch Requested!</span>
-            )}
             <button
               onClick={() => {
                 navigate("/");
               }}
             >
-              <img src={home} alt="" width={"36px"} />
+              <img src={home} className="homeIcon" alt="" />
             </button>
           </div>
         </>

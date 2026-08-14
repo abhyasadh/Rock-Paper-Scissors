@@ -1,6 +1,57 @@
-# Getting Started with Create React App
+# Rock Paper Scissors
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A real-time Rock Paper Scissors game powered by a WebSocket backend.
+
+## Setup
+
+### Backend (WebSocket server)
+
+1. Install dependencies:
+   ```bash
+   cd backend
+   npm install
+   ```
+
+2. Configure the port. Copy the example env file and set your values:
+   ```bash
+   cp .env.example .env
+   ```
+   Then edit `.env`:
+   ```
+   # Port the WebSocket server listens on
+   PORT = 5000
+   ```
+   > Make sure `REACT_APP_PORT` in the frontend `.env` matches this.
+
+3. Start the server:
+   ```bash
+   npm start
+   ```
+
+### Frontend (React app)
+
+1. Install dependencies:
+   ```bash
+   cd rock-paper-scissors
+   npm install
+   ```
+
+2. Configure the backend WebSocket address. Copy the example env file and set your values:
+   ```bash
+   cp .env.example .env
+   ```
+   Then edit `.env`:
+   ```
+   # IP address (or hostname) of the backend server
+   REACT_APP_IP=192.168.1.1
+   # Port the backend WebSocket server listens on
+   REACT_APP_PORT=5000
+   ```
+
+3. Start the development server:
+   ```bash
+   npm start
+   ```
 
 ## Available Scripts
 

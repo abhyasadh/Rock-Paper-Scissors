@@ -20,7 +20,7 @@ function Home() {
 
   const createGame = () => {
     connectToServer(
-      "ws://localhost:5000",
+      "ws://100.115.222.100:5000",
       (event) => {
         const message = JSON.parse(event.data);
         if (message.type === "game_created") {
@@ -48,7 +48,7 @@ function Home() {
     }
 
     connectToServer(
-      "ws://localhost:5000",
+      "ws://100.115.222.100:5000",
       (event) => {
         const message = JSON.parse(event.data);
         if (message.type === "choice_made") {

@@ -81,6 +81,15 @@ function Home() {
 
           <div className="menu" id="menu">
             <button
+              id="singlePlayerBtn"
+              className="button"
+              onClick={() => {
+                navigate("/singleplayer");
+              }}
+            >
+              Single Player
+            </button>
+            <button
               id="createGameBtn"
               className="button"
               onClick={() => {
